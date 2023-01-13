@@ -5,12 +5,11 @@ A idéia principal é que quando um usuário acesse o nginx, o mesmo fará uma c
 
 O retorno da aplicação node.js para o nginx deverá ser:
 
-<h1>Full Cycle Rocks!</h1>
+- Full Cycle Rocks!
 
 - Lista de nomes cadastrados no banco de dados.
 
-* Para executar: 
+# Para executar:
 docker-compose up -d
-porta: 8080
 
 * A linguagem de programação para este desafio é Node/JavaScript.
