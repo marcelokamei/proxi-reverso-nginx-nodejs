@@ -1,58 +1,34 @@
-const express = require('express');
-const axios = require('axios').default;
-const mysql = require('mysql');
-
-const app = express();
-const PORT = 3000;
+const random_name = require('node-random-name')
+const express = require('express')
+const app = express()
+const port = 3000
 
 const config = {
-  host: 'db',
-  user: 'root',
-  password: 'password',
-  database: 'nodedb',
+	host: 'db',
+	user: 'root',
+	password: 'root',
+	database: 'nodedb'
 };
 
-app.get('/', (req, res) => {
-  insertPeopleName(res);
-});
+const mysql = require('mysql')
+const connection = mysql.createConnection(config)
 
-app.listen(PORT, () => {
-  console.log('STARTED AT ' + PORT);
-});
+app.listen(port, () => {
+	console.log('NODEJS EM EXECUÇÃO NA PORTA : ' + port)
+})
 
-async function getPersonName() {
-  const RANDOM = Math.floor(Math.random() * 10);
-  const response = await axios.get('https://swapi.dev/api/people');
-  personName = response.data.results;
-  return personName[RANDOM].name;
-}
+app.get('/', (req, res) => {	
+	var sqlInsert = `INSERT INTO PEOPLE(NAME) VALUES ('` + random_name() + `')`
+	connection.query(sqlInsert)
 
-async function insertPeopleName(res) {
-  const name = await getPersonName();
-  const connection = mysql.createConnection(config);
-  const sql = `INSERT INTO people(name) values('${name}')`;
-    
-  connection.query(sql);
-  console.log(`${name} inserido no banco!`);    
-  getPeople(res, connection);
-}
+	var sqlSelect = `SELECT NAME FROM PEOPLE`	
+	var resultList = ''
 
-function getPeople(res, connection) {    
-  const sql = `SELECT id, name FROM people`;  
-  
-  connection.query(sql, (error, results, fields) => {
-    if (error) {
-      throw error
-    };
-    
-    let table = '<table>';
-    table += '<tr><th>></th><th>Nome</th></tr>';
-    for(let people of results) {      
-      table += `<tr><td>${people.id}</td><td>${people.name}</td></tr>`;
-    }
+	connection.query(sqlSelect, function(err, result, fields) {
+		Object.keys(result).forEach(function(key) {
+			resultList = resultList + '<li>' + result[key].NAME + '</li>'
+		})
 
-    table += '</table>';    
-    res.send('<h1>Full Cycle Rocks!</h1>' + table);    
-  });   
-  connection.end();
-}
+		res.send('<h1>Full Cycle Rocks!</h1><ul>' + resultList + '</ul>')
+	})
+})
